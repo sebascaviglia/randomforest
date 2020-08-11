@@ -1,39 +1,42 @@
-# History files
-.Rhistory
-.Rapp.history
+title: "R Notebook"
+output: html_notebook
+---
 
-# Session Data files
-.RData
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-# User-specific files
-.Ruserdata
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-# Example code in package build process
-*-Ex.R
+```{r}
+# random forest 
 
-# Output files from R CMD build
-/*.tar.gz
+#instalamos librerias
 
-# Output files from R CMD check
-/*.Rcheck/
+library("randomForest")
+library(caret)
 
-# RStudio files
-.Rproj.user/
+#cargamos data set
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+banknote <- read.csv("../Desktop/sebastian/r studio/cheat sheet/banknote-authentication.csv.txt")
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+#comvertimos variable a factor
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+banknote$class <- factor(banknote$class)
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+#creamos un subconjunto de datos
 
-# R Environment Variables
-.Renviron
+set.seed(2018)
+training.ids <- createDataPartition(banknote$class, p = 0.7, list = FALSE)
+
+#creamos el modelo
+
+mod <-  randomForest(x= banknote[training.ids ,1:4],
+                     y= banknote[training.ids ,5],
+                     ntree = 500,
+                     keep.forest = TRUE)
+
+
+pred <- predict(mod,banknote[-training.ids,] )
+
+#creamos matriz confusion
+
+table(banknote[-training.ids,"class"], pred, dnn= c("actual","predicho"))
